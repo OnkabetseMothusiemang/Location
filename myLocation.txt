@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime location tracker</title>
+
+    <!-- leaflet css  -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            width: 40%;
+            height: 400px;
+            margin: 0 auto; /* Center the map horizontally */
+            padding: 20px; /* Add padding around the map */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <!-- leaflet js  -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Map initialization 
+        var map = L.map('map').setView([-25.4965, 28.1041], 13); // Set to Soshanguve coordinates
+
+        // Google Maps API key
+        var googleMapsApiKey = "AIzaSyANyEAM-XJv4DlL4h1yJlo0VwHBMMqDvHc";
+
+        //osm layer
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        osm.addTo(map);
+
+        // Car icon
+        var carIcon = L.icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            tooltipAnchor: [16, -28],
+            shadowSize: [41, 41]
+        });
+
+        var carMarker = L.marker([-25.4965, 28.1041], { icon: carIcon }).addTo(map); // Initial position of the car
+
+        if (!navigator.geolocation) {
+            console.log("Your browser doesn't support geolocation feature!")
+        } else {
+            setInterval(() => {
+                navigator.geolocation.getCurrentPosition(getPosition)
+            }, 5000);
+        }
+
+        var marker;
+
+        function getPosition(position) {
+            // console.log(position)
+            var lat = position.coords.latitude
+            var long = position.coords.longitude
+
+            if (marker) {
+                map.removeLayer(marker)
+            }
+
+            if (carMarker) {
+                map.removeLayer(carMarker); // Remove previous car marker
+            }
+
+            marker = L.marker([lat, long])
+            carMarker = L.marker([lat, long], { icon: carIcon }).addTo(map); // Update car marker position
+
+            map.setView([lat, long], 13); // Set map view to current location
+            marker.addTo(map); // Add marker to the map
+
+            console.log("Your coordinate is: Lat: " + lat + " Long: " + long)
+        }
+
+    </script>
+</body>
+
+</html>
